@@ -33,9 +33,10 @@ init(_Args) ->
 
 add_worker(N, Workers) when N > 0->
     {ok, Pid} = supervisor:start_child(supervisor, []),
-    add_worker(N-1,[Pid|Workers]);
+    add_worker(N-1,queue:in(Pid,Workers));
 
 add_worker(0, Workers) ->
+    io:format("Workers PID: ~w~n",[Workers]),
     Workers.
 
 
