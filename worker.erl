@@ -53,4 +53,4 @@ get_work(Pid,Msg) ->
 %% Worker Logic
 
 worker_msg_parser(Msg) ->
-    io:format("Your message is: ~p~n",[Msg]).
+    io:format("Your message is: ~p~n|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||~n",[Msg]).

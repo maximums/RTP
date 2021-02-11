@@ -31,7 +31,7 @@ terminate(_Reason, _State) ->
     ok.
 
 
-% DIci 
+%%%%%%%%%% Sync nu am nevoie parca
 
 handle_call(stop, _From, State) ->
     {stop, normal, stopped, State};
@@ -39,13 +39,13 @@ handle_call(stop, _From, State) ->
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
-%% //////////////
+%%%%%%%%%%%%%%%%%%%%%%
 
 round_robin(Workers, Msg) ->
     {{value, Worker}, NewWorkers} = queue:out(Workers),
     io:format("Worker PID: ~p~n",[Worker]),
     gen_server:cast(Worker, Msg),
-    [NewWorkers].
+    [queue:in(Worker,NewWorkers)].
 
 
 
