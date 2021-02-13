@@ -43,7 +43,7 @@ handle_call(_Request, _From, State) ->
 
 round_robin(Workers, Msg) ->
     {{value, Worker}, NewWorkers} = queue:out(Workers),
-    io:format("Worker PID: ~p~n",[Worker]),
+    % io:format("Worker PID: ~p~n",[Worker]),
     gen_server:cast(Worker, Msg),
     [queue:in(Worker,NewWorkers)].
 

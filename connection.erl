@@ -1,11 +1,11 @@
 -module(connection).
-% -export([init/0,request/1]).
--export([t/0]).
+-export([start/1]).
 
-t() ->
-    inets:start(),
-    httpc:request(get, {"http://localhost:8000/tweets/1", []}, [], [{sync, false}, {stream, self}]),
-    inf_loop(), ok.
+start(Route) ->
+    io:format("APP PID ~p~n~p~n",[self(),Route]),
+    httpc:request(get, {Route, []}, [], [{sync, false}, {stream, self}]),
+    inf_loop(),
+    ok.
 
 inf_loop() ->
     receive

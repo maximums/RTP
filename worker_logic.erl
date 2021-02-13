@@ -8,4 +8,6 @@
 
 worker_handler() ->
     receive
+        _ ->
+            ok
 end.
