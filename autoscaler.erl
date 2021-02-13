@@ -13,7 +13,7 @@ start_link() ->
 init(_Args) ->
     sys:statistics(router, true),
     erlang:send_after(0, self(), trigger),
-    {ok, []}.
+    {ok, [0,0]}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
@@ -23,8 +23,10 @@ handle_info(trigger, State) ->
     NewState = get_msg_nr(sys:statistics(router, get)),
     sys:statistics(router, false),
     sys:statistics(router, true),
+    [_H|T] = State,
+    [HH|_TT] = T,
     erlang:send_after(?INTERVAL, self(), trigger),
-    {noreply, NewState};
+    {noreply, [NewState,HH+1]};
 
 handle_info(_Info, State) ->
     {noreply, State}.

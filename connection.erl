@@ -4,14 +4,15 @@
 start(Route) ->
     io:format("APP PID ~p~n~p~n",[self(),Route]),
     httpc:request(get, {Route, []}, [], [{sync, false}, {stream, self}]),
-    inf_loop(),
+    inf_loop(Route),
     ok.
 
-inf_loop() ->
+inf_loop(Route) ->
     receive
-        stop ->
-            {stoped, self()};
+        {http, {_T,{error,socket_closed_remotely}}} ->
+            io:format("____________________________________________~n~p~n",[self()]),
+            start(Route);
         Msg ->
             gen_server:cast(router,{msg,{init_msg, Msg}}),
-            inf_loop()
+            inf_loop(Route)
 end.
