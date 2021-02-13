@@ -11,25 +11,27 @@ start_link() ->
     gen_server:start_link({local, autoscaler}, ?MODULE, [], []).
 
 init(_Args) ->
+    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
     sys:statistics(router, true),
     erlang:send_after(0, self(), trigger),
-    {ok, [0,0]}.
+    {ok, [0]}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info(trigger, State) ->
-    io:format("State>>>>>>>>>>>> ~p~n",[State]),
+handle_info(trigger, _State) ->
+    % io:format("State>>>>>>>>>>>> ~p~n",[State]),
     NewState = get_msg_nr(sys:statistics(router, get)),
     sys:statistics(router, false),
     sys:statistics(router, true),
-    [_H|T] = State,
-    [HH|_TT] = T,
     erlang:send_after(?INTERVAL, self(), trigger),
-    {noreply, [NewState,HH+1]};
+    {noreply, NewState};
 
 handle_info(_Info, State) ->
     {noreply, State}.
+
+% workers_adjust(Nr) when Nr > 250->
+%     daynamic_supervisor
 
 get_msg_nr(Statistics) ->
     {ok, Ls} = Statistics,

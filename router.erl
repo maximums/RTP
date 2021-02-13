@@ -5,16 +5,18 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/1]).
+-export([start_link/0]).
 
 %% Callbacks
 -export([init/1,handle_cast/2, handle_call/3, handle_info/2, terminate/2]).
 
 
-start_link(Workers) ->
+start_link() ->
+    Workers = daynamic_supervisor:add_worker(5, queue:new()),
     gen_server:start_link({local, router}, ?MODULE, [Workers], []).
 
 init(Workers) ->
+    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
     {ok, Workers}.
 
 handle_cast({msg, Msg}, State) ->

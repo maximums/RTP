@@ -18,7 +18,7 @@ start_link() ->
 
 init(_Args) ->
     process_flag(trap_exit, true),
-    io:format("~p starting....~n",[self()]),
+    io:format("~p worker....~n",[self()]),
     {ok, []}.
 
 handle_call(stop, _From, State) ->

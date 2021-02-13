@@ -1,7 +1,5 @@
 -module(super_super).
 -author("Dodi Cristian-Dumitru").
--define(ROUTE_1, "http://localhost:8000/tweets/1").
--define(ROUTE_2, "http://localhost:8000/tweets/2").
 
 -behaviour(application).
 
@@ -11,12 +9,9 @@ start() ->
     application:start(?MODULE).
 
 start(_Type, _Args) ->
+    io:format("App starting...~n",[]),
     inets:start(),
-    daynamic_supervisor:start_link(),
-    Q = daynamic_supervisor:add_worker(5, queue:new()),
-    router:start_link(Q),
-    autoscaler:start_link(),
-    connect().
+    mega_super:start_link().
 
 stop() ->
     application:stop(?MODULE).
@@ -24,9 +19,4 @@ stop() ->
 stop(_State) ->
     ok.
 
-connect() ->
-    io:format("APP PID ~p~n",[self()]),
-    PID = spawn(connection, start, [?ROUTE_1]),
-    io:format("PID PID ~p~n",[PID]),
-    connection:start(?ROUTE_2).
 
