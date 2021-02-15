@@ -1,6 +1,7 @@
 -module(autoscaler).
--author("Dodi Cristian-Dumitru").
 -behaviour(gen_server).
+-author("Dodi Cristian-Dumitru").
+
 -define(INTERVAL, 1000). % One second
 
 %% API
@@ -12,31 +13,28 @@ start_link() ->
 
 init(_Args) ->
     io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
-    sys:statistics(router, true),
-    erlang:send_after(0, self(), trigger),
     {ok, [0]}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info(trigger, _State) ->
-    % io:format("State>>>>>>>>>>>> ~p~n",[State]),
+handle_info(count, State) ->
+    io:format("State>>>>>>>>>>>> ~p~n",[State]),
     NewState = get_msg_nr(sys:statistics(router, get)),
     sys:statistics(router, false),
     sys:statistics(router, true),
-    erlang:send_after(?INTERVAL, self(), trigger),
+    erlang:send_after(?INTERVAL, self(), count),
     {noreply, NewState};
 
 handle_info(_Info, State) ->
     {noreply, State}.
 
-% workers_adjust(Nr) when Nr > 250->
-%     daynamic_supervisor
-
 get_msg_nr(Statistics) ->
     {ok, Ls} = Statistics,
     {messages_in, Nr_of_msg} = lists:keyfind(messages_in, 1, Ls),
     Nr_of_msg.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 terminate(_Reason, _State) ->
     ok.
@@ -44,7 +42,6 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle_call(stop, _From, State) ->
     {stop, normal, stopped, State};

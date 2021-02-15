@@ -25,20 +25,20 @@ init(_Args) ->
             modules => [daynamic_supervisor]
         },
         #{
-            id => router,
-            start => {router, start_link, []},
-            restart => permanent,
-            shutdown => infinity,
-            type => worker,
-            modules => [router]
-        },
-        #{
             id => autoscaler,
             start => {autoscaler, start_link, []},
             restart => permanent,
             shutdown => infinity,
             type => worker,
             modules => [autoscaler]
+        },
+        #{
+            id => router,
+            start => {router, start_link, []},
+            restart => permanent,
+            shutdown => infinity,
+            type => worker,
+            modules => [router]
         },
         #{
             id => connection,

@@ -1,8 +1,6 @@
 -module(router).
--export([]).
--author("Dodi Cristian-Dumitru").
-
 -behaviour(gen_server).
+-author("Dodi Cristian-Dumitru").
 
 %% API
 -export([start_link/0]).
@@ -12,11 +10,12 @@
 
 
 start_link() ->
-    Workers = daynamic_supervisor:add_worker(5, queue:new()),
-    gen_server:start_link({local, router}, ?MODULE, [Workers], []).
+    Workers = daynamic_supervisor:add_worker(2, queue:new()),
+    gen_server:start_link({local, router}, ?MODULE, [Workers], [{debug, [statistics]}]).
 
 init(Workers) ->
     io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
+    autoscaler ! count,
     {ok, Workers}.
 
 handle_cast({msg, Msg}, State) ->
@@ -42,6 +41,7 @@ handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 %%%%%%%%%%%%%%%%%%%%%%
+
 
 round_robin(Workers, Msg) ->
     {{value, Worker}, NewWorkers} = queue:out(Workers),

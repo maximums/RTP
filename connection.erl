@@ -12,9 +12,9 @@ start_link() ->
     
 init(_Args) ->
     io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
-    httpc:request(get, {?ROUTE_1, []}, [], [{sync, false}, {stream, self}]),
-    httpc:request(get, {?ROUTE_2, []}, [], [{sync, false}, {stream, self}]),
-    {ok, []}.
+    httpc:request(get, {?ROUTE_1, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
+    httpc:request(get, {?ROUTE_2, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
+    {ok, null}.
 
 handle_call(stop, _From, State) ->
     {stop, normal, stopped, State};
@@ -26,11 +26,31 @@ handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_info({http, {_Reference,{error,socket_closed_remotely}}},State) ->
-    ?MODULE:terminate(normal,State),
+    erlang:error(socket_closed_remotely),
     {noreply,State};
 
-handle_info(Info, State) ->
-    gen_server:cast(router,{msg,{init_msg, Info}}),
+handle_info({http,{_RequestId, stream, Body}}, State) when State =/= null ->
+    T = binary_to_list(Body),
+    F = ends_with(T,[125,10,10]),
+    if F ->
+        gen_server:cast(router,{msg,{init_msg, State++T}}),
+        {noreply, null};
+    true ->
+        {noreply, State++T}
+end;
+
+handle_info({http,{_RequestId, stream, Body}}, null) ->
+    T = binary_to_list(Body),
+    F = ends_with(T,[125,10,10]),
+    if F ->
+        gen_server:cast(router,{msg,{init_msg, T}}),
+        {noreply, null};
+    true ->
+        {noreply, T}
+end;
+
+
+handle_info(_Info, State) ->
     {noreply, State}.
 
 terminate(_Reason, _State) ->
@@ -38,3 +58,6 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+ends_with(X,Y)->
+    lists:suffix(Y,X).
