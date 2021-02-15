@@ -18,12 +18,13 @@ init(_Args) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info(count, State) ->
-    io:format("State>>>>>>>>>>>> ~p~n",[State]),
+handle_info({count, Workers}, _State) ->
+    io:format("State>>>>>>>>>>>> ~p~n",[Workers]),
     NewState = get_msg_nr(sys:statistics(router, get)),
+    NW = adjust_workers(NewState, Workers),
     sys:statistics(router, false),
     sys:statistics(router, true),
-    erlang:send_after(?INTERVAL, self(), count),
+    erlang:send_after(?INTERVAL, self(), {count,NW}),
     {noreply, NewState};
 
 handle_info(_Info, State) ->
@@ -33,6 +34,16 @@ get_msg_nr(Statistics) ->
     {ok, Ls} = Statistics,
     {messages_in, Nr_of_msg} = lists:keyfind(messages_in, 1, Ls),
     Nr_of_msg.
+
+adjust_workers(Nr_of_msg, Workers) ->
+    [H|_] = Workers,
+    io:format("Len~p~n",[queue:len(H)]),
+    C = Nr_of_msg div 50,
+    Diff = C - queue:len(H),
+    NewWorkers = if Diff >= 0 -> daynamic_supervisor:add_worker(Diff, Workers);
+                    true -> daynamic_supervisor:kill_workers(-Diff, Workers)
+        end,
+    NewWorkers.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -48,7 +59,3 @@ handle_call(stop, _From, State) ->
 
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
-
-
-
-

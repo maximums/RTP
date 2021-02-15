@@ -10,12 +10,12 @@
 
 
 start_link() ->
-    Workers = daynamic_supervisor:add_worker(2, queue:new()),
+    Workers = daynamic_supervisor:add_worker(5, queue:new()),
     gen_server:start_link({local, router}, ?MODULE, [Workers], [{debug, [statistics]}]).
 
 init(Workers) ->
     io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
-    autoscaler ! count,
+    autoscaler ! {count, Workers},
     {ok, Workers}.
 
 handle_cast({msg, Msg}, State) ->
@@ -31,15 +31,6 @@ handle_info(_Info, State) ->
 terminate(_Reason, _State) ->
     ok.
 
-
-%%%%%%%%%% Sync nu am nevoie parca
-
-handle_call(stop, _From, State) ->
-    {stop, normal, stopped, State};
-
-handle_call(_Request, _From, State) ->
-    {reply, ok, State}.
-
 %%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -50,4 +41,10 @@ round_robin(Workers, Msg) ->
     [queue:in(Worker,NewWorkers)].
 
 
+%%%%%%%%%% Sync nu am nevoie parca
 
+handle_call(stop, _From, State) ->
+    {stop, normal, stopped, State};
+
+handle_call(_Request, _From, State) ->
+    {reply, ok, State}.

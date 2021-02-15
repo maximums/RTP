@@ -3,7 +3,7 @@
 -author("Dodi Cristian-Dumitru").
 
 %% API
--export([start_link/0, add_worker/2]).
+-export([start_link/0, add_worker/2, kill_workers/2]).
 
 %%
 -export([init/1]).
@@ -37,6 +37,16 @@ add_worker(N, Workers) when N > 0->
 
 add_worker(0, Workers) ->
     io:format("Workers PID: ~w~n",[Workers]),
+    Workers.
+
+
+kill_workers(N, Workers) when N > 0 ->
+    [H|_] = Workers,
+    {{value, _Pid}, NewWorkers} = queue:out(H),
+    io:format("AAAAAAAAAAA ~p~n",[NewWorkers]),
+    kill_workers(N-1,NewWorkers);
+    
+kill_workers(0, Workers) ->
     Workers.
 
 
