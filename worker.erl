@@ -28,6 +28,7 @@ handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 handle_cast({init_msg, Msg}, State) ->
+    timer:sleep(5000),
     worker_msg_parser(Msg),
     {noreply, State};
 
@@ -53,5 +54,5 @@ get_work(Pid,Msg) ->
 %% Worker Logic
 
 worker_msg_parser(Msg) ->
-    io:format("Your PID is: ~p~n|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||~n",[self()]).   
-    % ok.
+    % io:format("Your PID is: ~p~n|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||~n",[self()]).   
+    ok.
