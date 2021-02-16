@@ -18,13 +18,13 @@ init(_Args) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info({count, Workers}, _State) ->
-    io:format("State>>>>>>>>>>>> ~p~n",[Workers]),
+handle_info(count, _State) ->
     NewState = get_msg_nr(sys:statistics(router, get)),
-    NW = adjust_workers(NewState, Workers),
+    adjust_workers(NewState),
     sys:statistics(router, false),
+    io:format("Messages: ~p <-------> Workers: ~p <----------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
     sys:statistics(router, true),
-    erlang:send_after(?INTERVAL, self(), {count,NW}),
+    erlang:send_after(?INTERVAL, self(), count),
     {noreply, NewState};
 
 handle_info(_Info, State) ->
@@ -35,13 +35,12 @@ get_msg_nr(Statistics) ->
     {messages_in, Nr_of_msg} = lists:keyfind(messages_in, 1, Ls),
     Nr_of_msg.
 
-adjust_workers(Nr_of_msg, Workers) ->
-    [H|_] = Workers,
-    io:format("Len~p~n",[queue:len(H)]),
-    C = Nr_of_msg div 50,
-    Diff = C - queue:len(H),
-    NewWorkers = if Diff >= 0 -> daynamic_supervisor:add_worker(Diff, Workers);
-                    true -> daynamic_supervisor:kill_workers(-Diff, Workers)
+adjust_workers(Nr_of_msg) ->
+    C = Nr_of_msg div 10,
+    Diff = C - proplists:get_value(workers, supervisor:count_children(supervisor)),
+    % io:format("DDDDDDDDDDDDDDDDDDDD: ~p~n",[Diff]),
+    NewWorkers = if Diff >= 0 -> daynamic_supervisor:add_worker(Diff);
+                    true -> daynamic_supervisor:kill_workers(-Diff)
         end,
     NewWorkers.
 

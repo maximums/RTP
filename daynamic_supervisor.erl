@@ -1,9 +1,10 @@
 -module(daynamic_supervisor).
 -behaviour(supervisor).
 -author("Dodi Cristian-Dumitru").
+-define(MIN_WORKERS, 1).
 
 %% API
--export([start_link/0, add_worker/2, kill_workers/2]).
+-export([start_link/0, add_worker/1, kill_workers/1]).
 
 %%
 -export([init/1]).
@@ -31,23 +32,29 @@ init(_Args) ->
 
     {ok, {SupervisorSpecification, ChildSpecifications}}.
 
-add_worker(N, Workers) when N > 0->
+add_worker(N) when N > 0->
     {ok, Pid} = supervisor:start_child(supervisor, []),
-    add_worker(N-1,queue:in(Pid,Workers));
+    global:register_name(Pid,Pid),
+    add_worker(N-1);
 
-add_worker(0, Workers) ->
-    io:format("Workers PID: ~w~n",[Workers]),
-    Workers.
+add_worker(0) ->
+    0.
 
+kill_workers(N) when N > 0 ->
+    Workers = supervisor:which_children(supervisor),
+    kill_workers(N, Workers);
 
-kill_workers(N, Workers) when N > 0 ->
-    [H|_] = Workers,
-    {{value, _Pid}, NewWorkers} = queue:out(H),
-    io:format("AAAAAAAAAAA ~p~n",[NewWorkers]),
-    kill_workers(N-1,NewWorkers);
+kill_workers(0) ->
+    ok.
+
+kill_workers(N, Workers) when (length(Workers) > ?MIN_WORKERS) ->
+    [{undefined, Pid, worker,[worker]}|_] = Workers,
+    supervisor:terminate_child(supervisor, Pid),
+    kill_workers(N-1);
+
+kill_workers(_N, _Workers) ->
+    ok.
     
-kill_workers(0, Workers) ->
-    Workers.
 
 
             

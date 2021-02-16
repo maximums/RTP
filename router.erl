@@ -10,20 +10,17 @@
 
 
 start_link() ->
-    Workers = daynamic_supervisor:add_worker(5, queue:new()),
-    gen_server:start_link({local, router}, ?MODULE, [Workers], [{debug, [statistics]}]).
+    gen_server:start_link({local, router}, ?MODULE, [], [{debug, [statistics]}]).
 
-init(Workers) ->
-    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
-    autoscaler ! {count, Workers},
-    {ok, Workers}.
+init(_Args) ->
+    daynamic_supervisor:add_worker(5),
+    autoscaler ! count,
+    {ok, 1}.
 
 handle_cast({msg, Msg}, State) ->
-    [H|_] = State,
-    {noreply, round_robin(H, Msg)};
-
-handle_cast({workers, Workers}, _State) ->
-    {noreply, Workers}.
+    % io:format("ROUTER STATE ~p~n",[State]),
+    Idx = round_robin(Msg, State),
+    {noreply, Idx}.
 
 handle_info(_Info, State) ->
     {noreply, State}.
@@ -34,11 +31,17 @@ terminate(_Reason, _State) ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 
-round_robin(Workers, Msg) ->
-    {{value, Worker}, NewWorkers} = queue:out(Workers),
-    % io:format("Worker PID: ~p~n",[Worker]),
-    gen_server:cast(Worker, Msg),
-    [queue:in(Worker,NewWorkers)].
+round_robin(Msg, Idx) ->
+    % io:format("Index: ~p~n",[Idx]),
+    Workers = global:registered_names(),
+    NewIdx = if Idx < length(Workers) ->
+                gen_server:cast(lists:nth(Idx, Workers), Msg),
+                Idx + 1;
+            true -> 
+                gen_server:cast(lists:nth(1, Workers), Msg),
+                1
+            end,
+    NewIdx.
 
 
 %%%%%%%%%% Sync nu am nevoie parca
