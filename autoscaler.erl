@@ -23,7 +23,7 @@ handle_info(count, _State) ->
     adjust_workers(NewState),
     sys:statistics(router, false),
     fcking_function(),
-    io:format("Messages: ~p <-------> Workers: ~p <----------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
+    % io:format("Messages: ~p <-------> Workers: ~p <----------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
     sys:statistics(router, true),
     erlang:send_after(?INTERVAL, self(), count),
     {noreply, NewState};
@@ -54,7 +54,7 @@ fcking_function([]) ->
 fcking_function(L) ->
     [H|T] = L,
     {message_queue_len, Len} = process_info(H, message_queue_len),
-    io:format("Mess Len: ~p and PID ~p~n", [Len, H]),
+    % io:format("Mess Len: ~p and PID ~p~n", [Len, H]),
     fcking_function(T).
 
 

@@ -13,7 +13,7 @@ start_link() ->
     gen_server:start_link({local, router}, ?MODULE, [], [{debug, [statistics]}]).
 
 init(_Args) ->
-    daynamic_supervisor:add_worker(5),
+    daynamic_supervisor:add_worker(2),
     autoscaler ! count,
     {ok, 1}.
 

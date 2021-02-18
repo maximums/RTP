@@ -1,3 +1,0 @@
-1. read properly data stream.
-2. actual autoscaler functions.
-3. worker - parse message( obtain a list of words), sentiment analyz, if "panic" -> die.

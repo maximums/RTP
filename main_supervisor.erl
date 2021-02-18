@@ -1,12 +1,14 @@
--module(mega_super).
+-module(main_supervisor).
 -behaviour(supervisor).
+-define(TWEET1,"http://localhost:8000/tweets/1").
+-define(TWEET2,"http://localhost:8000/tweets/2").
 
 %% API
 -export([start_link/0]).
 -export([init/1]).
 
 start_link() ->
-    supervisor:start_link({local, mega_super}, ?MODULE, []).
+    supervisor:start_link({local, main_supervisor}, ?MODULE, []).
 
 init(_Args) ->
     io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
@@ -42,7 +44,7 @@ init(_Args) ->
         },
         #{
             id => connection,
-            start => {connection, start_link, []},
+            start => {connection, start_link, [?TWEET1,?TWEET2]},
             restart => permanent,
             shutdown => infinity,
             type => worker,

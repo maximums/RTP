@@ -1,19 +1,18 @@
 -module(connection).
 -behaviour(gen_server).
--define(ROUTE_1, "http://localhost:8000/tweets/1").
--define(ROUTE_2, "http://localhost:8000/tweets/2").
 
 %% API
--export([start_link/0]).
+-export([start_link/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
-start_link() ->
-    gen_server:start_link({local, connection}, ?MODULE, [], []).
+start_link(ROUTE_1,ROUTE_2) ->
+    gen_server:start_link({local, connection}, ?MODULE, [ROUTE_1,ROUTE_2], []).
     
-init(_Args) ->
-    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
-    httpc:request(get, {?ROUTE_1, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
-    httpc:request(get, {?ROUTE_2, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
+init(URLS) ->
+    [ROUTE_1|Ts] = URLS,
+    [ROUTE_2|_] = Ts,
+    httpc:request(get, {ROUTE_1, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
+    httpc:request(get, {ROUTE_2, []}, [], [{sync, false}, {stream, self},{full_result,false}]),
     {ok, null}.
 
 handle_call(stop, _From, State) ->
