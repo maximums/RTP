@@ -22,6 +22,7 @@ handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 handle_cast({init_msg, Msg}, State) ->
+    timer:sleep(rand:uniform(41) + 9),
     msg_parser(Msg),
     {noreply, State};
 
@@ -49,10 +50,8 @@ msg_parser(Msg) ->
 
 sentiment_anal("en", Msg)->
     Lexemes = string:tokens(string:trim(Msg), " ,.?!;:/'"),
-    ok;
-    % Score = [emotion_values:get_emot_score(Word)|| Word<-Lexemes],
-    % io:format("~n||||||||||||||||||||||||||||||||||||||||~n~p~n",[Lexemes]);
-    % io:format("~n~p~n~n--------------->>>>>>>>>> ~p",[Msg,lists:sum(Score)]);
+    Score = [emotion_values:get_emot_score(Word)|| Word<-Lexemes],
+    io:format("Tweet:~n~s~n--------------------------------------------~nScore: ~p~n",[Msg, lists:sum(Score)/length(Lexemes)]);
 
 sentiment_anal(_,_Msg)->
     ok.

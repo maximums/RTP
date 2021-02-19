@@ -5,18 +5,16 @@
 
 %% API
 -export([start_link/0, add_worker/1, kill_workers/1]).
-
-%%
 -export([init/1]).
 
 start_link() ->
     supervisor:start_link({local, supervisor}, ?MODULE, []).
 
 init(_Args) ->
-    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
+    io:format("Daynamic supervisor started ~p~n", [self()]),
     SupervisorSpecification = #{
         strategy => simple_one_for_one,
-        intensity => 10,
+        intensity => 100,
         period => 60},
 
     ChildSpecifications = [

@@ -4,15 +4,16 @@
 
 -define(INTERVAL, 1000). % One second
 
-%% API
 -export([start_link/0]).
+
+%% Callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 start_link() ->
     gen_server:start_link({local, autoscaler}, ?MODULE, [], []).
 
 init(_Args) ->
-    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
+    io:format("Autoscaler started ~p~n",[self()]),
     {ok, [0]}.
 
 handle_cast(_Msg, State) ->
@@ -22,8 +23,8 @@ handle_info(count, _State) ->
     NewState = get_msg_nr(sys:statistics(router, get)),
     adjust_workers(NewState),
     sys:statistics(router, false),
-    fcking_function(),
-    % io:format("Messages: ~p <-------> Workers: ~p <----------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
+    for_debug(),
+    io:format("Messages: ~p <-------> Workers: ~p <------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
     sys:statistics(router, true),
     erlang:send_after(?INTERVAL, self(), count),
     {noreply, NewState};
@@ -39,23 +40,22 @@ get_msg_nr(Statistics) ->
 adjust_workers(Nr_of_msg) ->
     C = Nr_of_msg div 10,
     Diff = C - proplists:get_value(workers, supervisor:count_children(supervisor)),
-    % io:format("DDDDDDDDDDDDDDDDDDDD: ~p~n",[Diff]),
-    NewWorkers = if Diff >= 0 -> daynamic_supervisor:add_worker(Diff);
-                    true -> daynamic_supervisor:kill_workers(-Diff)
-        end,
-    NewWorkers.
+    if 
+        Diff >= 0 -> daynamic_supervisor:add_worker(Diff);
+        true -> daynamic_supervisor:kill_workers(-Diff)
+    end.
 
-fcking_function() ->
-    fcking_function(global:registered_names()).
+for_debug() ->
+    for_debug(global:registered_names()).
 
-fcking_function([]) ->
+for_debug([]) ->
     ok;
 
-fcking_function(L) ->
+for_debug(L) ->
     [H|T] = L,
     {message_queue_len, Len} = process_info(H, message_queue_len),
-    % io:format("Mess Len: ~p and PID ~p~n", [Len, H]),
-    fcking_function(T).
+    io:format("Mess Len: ~p and PID ~p~n", [Len, H]),
+    for_debug(T).
 
 
 

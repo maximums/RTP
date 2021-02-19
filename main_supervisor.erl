@@ -11,11 +11,11 @@ start_link() ->
     supervisor:start_link({local, main_supervisor}, ?MODULE, []).
 
 init(_Args) ->
-    io:format("~p (~p) starting...~n",[{local, ?MODULE}, self()]),
+    io:format("Main supervisor started ~p~n",[self()]),
     SupervisorSpecification = #{
         strategy => one_for_all,
         intensity => 10,
-        period => 60},
+        period => 6},
 
     ChildSpecifications = [
         #{
