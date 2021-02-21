@@ -26,6 +26,10 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
+handle_info({http, {_Reference,{error,socket_closed_remotely}}},State) ->
+    erlang:error(socket_closed_remotely),
+    {noreply,State};
+
 handle_info({http, {_RequestId, stream, Body}}, State) ->
     {noreply, sse_stream:get_msgs(Body, State)};
 

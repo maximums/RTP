@@ -8,7 +8,7 @@
 
 
 start_link() ->
-    gen_server:start_link(?MODULE, [], []).
+    gen_server:start_link(?MODULE, [], [{debug, [statistics]}]).
 
 init(_Args) ->
     process_flag(trap_exit, true),
