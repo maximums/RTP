@@ -30,5 +30,5 @@ app:start().
 ```
 
 ## Demonstration:
-![Output](https://github.com/maximums/RTP/blob/master/vd/1.gif)
+![Output](https://github.com/maximums/RTP/blob/main/vd/1.gif)
 
