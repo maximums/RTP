@@ -30,8 +30,5 @@ app:start().
 ```
 
 ## Demonstration:
-
-<video width="320" height="240" controls>
-  <source src="/vd/1.mp4" type="video/mp4">
-</video>
+![Output](https://github.com/maximums/RTP/blob/master/vd/1.gif)
 
