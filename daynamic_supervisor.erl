@@ -31,8 +31,7 @@ init(_Args) ->
     {ok, {SupervisorSpecification, ChildSpecifications}}.
 
 add_worker(N) when N > 0->
-    {ok, Pid} = supervisor:start_child(supervisor, []),
-    global:register_name(Pid,Pid),
+    {ok, _Pid} = supervisor:start_child(supervisor, []),
     add_worker(N-1);
 
 add_worker(0) ->

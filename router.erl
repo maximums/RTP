@@ -5,7 +5,7 @@
 -export([start_link/0]).
 
 %% Callbacks
--export([init/1,handle_cast/2, handle_call/3, handle_info/2, terminate/2]).
+-export([init/1,handle_cast/2, handle_call/3, handle_info/2]).
 
 
 start_link() ->
@@ -13,7 +13,7 @@ start_link() ->
 
 init(_Args) ->
     io:format("Router started ~p~n",[self()]),
-    daynamic_supervisor:add_worker(1),
+    daynamic_supervisor:add_worker(2),
     autoscaler ! count,
     {ok, 1}.
 
@@ -23,9 +23,6 @@ handle_cast({msg, Msg}, State) ->
 
 handle_info(_Info, State) ->
     {noreply, State}.
-
-terminate(_Reason, _State) ->
-    ok.
 
 handle_call(stop, _From, State) ->
     {stop, normal, stopped, State};
@@ -38,11 +35,6 @@ handle_call(_Request, _From, State) ->
 
 round_robin(Msg, Idx) ->
     Workers = global:registered_names(),
-    NewIdx = if Idx < length(Workers) ->
-                gen_server:cast(lists:nth(Idx, Workers), Msg),
-                Idx + 1;
-            true -> 
-                gen_server:cast(lists:nth(1, Workers), Msg),
-                1
-            end,
+    NewIdx = if Idx < length(Workers) ->  gen_server:cast(lists:nth(Idx, Workers), {init_msg,Msg}), Idx + 1;
+                true -> gen_server:cast(lists:nth(1, Workers), {init_msg,Msg}), 1 end,
     NewIdx.

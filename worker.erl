@@ -3,7 +3,7 @@
 -author("Dodi Cristian-Dumitru").
 
 -export([start_link/0]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
 
 
@@ -22,7 +22,7 @@ handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
 handle_cast({init_msg, Msg}, State) ->
-    timer:sleep(rand:uniform(41) + 9),
+    timer:sleep(rand:uniform(491) + 9),
     msg_parser(Msg),
     {noreply, State};
 
@@ -32,18 +32,12 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(_Reason, _State) ->
-    ok.
-
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
-
 %% Worker Logic
 
 msg_parser(Msg) ->
-    Init_msg = string:prefix(string:chomp(Msg), "event: \"message\"\n\ndata: "),
+    Init_msg = string:chomp(Msg),
     PropList = mochijson2:decode(Init_msg),
-    {struct,[{<<"message">>,{struct,[{<<"tweet">>,{struct,Temp}},_]}}]} = PropList,
+    {struct, [{<<"message">>, {struct, [{<<"tweet">>, {struct, Temp}}, _]}}]} = PropList,
     Lang = proplists:get_value(<<"lang">>, Temp),
     Text = proplists:get_value(<<"text">>, Temp),
     sentiment_anal(binary_to_list(Lang), binary_to_list(Text)).
@@ -51,8 +45,8 @@ msg_parser(Msg) ->
 sentiment_anal("en", Msg)->
     Lexemes = string:tokens(string:trim(Msg), " ,.?!;:/'"),
     Score = [emotion_values:get_emot_score(Word)|| Word<-Lexemes],
-    io:format("Tweet:~n~s~n--------------------------------------------~nScore: ~p~n",[Msg, lists:sum(Score)/length(Lexemes)]);
+    io:format("Tweet:~n--------------------------------------------~n~s~nScore: ~p~n~n",[Msg, lists:sum(Score)/length(Lexemes)]);
 
 sentiment_anal(_,_Msg)->
     ok.
-    % io:format("~n<<<<<<<<<<<<<<<<<<<<<<< Invalid language >>>>>>>>>>>>>>>>>>~n").
+    % io:format("~n!n<<<<<<<<<<<<<<<<<<<<<<< Invalid language >>>>>>>>>>>>>>>>>>~n~n").

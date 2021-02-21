@@ -7,7 +7,7 @@
 -export([start_link/0]).
 
 %% Callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 
 start_link() ->
     gen_server:start_link({local, autoscaler}, ?MODULE, [], []).
@@ -23,7 +23,6 @@ handle_info(count, _State) ->
     NewState = get_msg_nr(sys:statistics(router, get)),
     adjust_workers(NewState),
     sys:statistics(router, false),
-    for_debug(),
     io:format("Messages: ~p <-------> Workers: ~p <------->~n",[NewState,proplists:get_value(workers, supervisor:count_children(supervisor))]),
     sys:statistics(router, true),
     erlang:send_after(?INTERVAL, self(), count),
@@ -45,28 +44,8 @@ adjust_workers(Nr_of_msg) ->
         true -> daynamic_supervisor:kill_workers(-Diff)
     end.
 
-for_debug() ->
-    for_debug(global:registered_names()).
-
-for_debug([]) ->
-    ok;
-
-for_debug(L) ->
-    [H|T] = L,
-    {message_queue_len, Len} = process_info(H, message_queue_len),
-    io:format("Mess Len: ~p and PID ~p~n", [Len, H]),
-    for_debug(T).
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-terminate(_Reason, _State) ->
-    ok.
-
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
-
 
 handle_call(stop, _From, State) ->
     {stop, normal, stopped, State};
