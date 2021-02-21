@@ -1,7 +1,7 @@
 # REAL TIME PROGRAMMING
-## Laboratory work 1
-## Student Dodi Cristian-Dumitru
-### Group: FAF-181
+### Laboratory work 1
+### Student Dodi Cristian-Dumitru
+#### Group: FAF-181
 
 <br>
 <hr>
