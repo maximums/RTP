@@ -1,6 +1,5 @@
--module(daynamic_supervisor).
+-module(dayn_super_engagement).
 -behaviour(supervisor).
--author("Dodi Cristian-Dumitru").
 -define(MIN_WORKERS, 1).
 
 %% API
@@ -8,10 +7,9 @@
 -export([init/1]).
 
 start_link() ->
-    supervisor:start_link({local, supervisor}, ?MODULE, []).
+    supervisor:start_link({local, dayn_super_engagement}, ?MODULE, []).
 
 init(_Args) ->
-    io:format("Daynamic supervisor started ~p~n", [self()]),
     SupervisorSpecification = #{
         strategy => simple_one_for_one,
         intensity => 100,
@@ -19,22 +17,20 @@ init(_Args) ->
 
     ChildSpecifications = [
         #{
-            id => worker,
-            start => {worker, start_link, []},
+            id => engage_worker,
+            start => {engage_worker, start_link, []},
             restart => permanent,
             shutdown => infinity,
             type => worker,
-            modules => [worker]
+            modules => [engage_worker]
         }
     ],
 
     {ok, {SupervisorSpecification, ChildSpecifications}}.
 
     add_worker(N) ->
-        supervisor_api:add_worker(N, supervisor).
+        supervisor_api:add_worker(N, dayn_super_engagement).
     
     kill_workers(N) ->
-        supervisor_api:kill_workers(N, supervisor).
-
-
-            
+        supervisor_api:kill_workers(N, dayn_super_engagement).
+      

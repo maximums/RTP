@@ -38,9 +38,10 @@ msg_parser(Msg) ->
     Init_msg = string:chomp(Msg),
     PropList = mochijson2:decode(Init_msg),
     {struct, [{<<"message">>, {struct, [{<<"tweet">>, {struct, Temp}}, _]}}]} = PropList,
-    Lang = proplists:get_value(<<"lang">>, Temp),
-    Text = proplists:get_value(<<"text">>, Temp),
-    sentiment_anal(binary_to_list(Lang), binary_to_list(Text)).
+    io:format("~n---------------------------------------------------------------------~n~p",[Temp]).
+    % Lang = proplists:get_value(<<"lang">>, Temp),
+    % Text = proplists:get_value(<<"text">>, Temp),
+    % sentiment_anal(binary_to_list(Lang), binary_to_list(Text)).
 
 sentiment_anal("en", Msg)->
     Lexemes = string:tokens(string:trim(Msg), " ,.?!;:/'"),
