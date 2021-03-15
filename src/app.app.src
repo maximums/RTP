@@ -1,0 +1,15 @@
+{application, app,
+ [{description, "RTP - Laboratory work 2"},
+  {vsn, "0.1.0"},
+  {registered, [supervisor, router, autoscaler, connection]},
+  {mod, {app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, [autoscaler, connection, daynamic_supervisor, router, worker, app, emotion_values]},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
