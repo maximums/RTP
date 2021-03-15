@@ -1,9 +1,1 @@
-lab2
-=====
-
-An OTP application
-
-Build
------
-
-    $ rebar3 compile
+# Lab2 ...etc,etc
