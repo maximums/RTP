@@ -38,5 +38,8 @@ ends_with(Str, SubStr) ->
 get_retweets(Tweet, undefined) ->
     gen_server:cast(router,{msg, Tweet});
 
-get_retweets(_Tweet, {struct, ReTweet}) ->
-    gen_server:cast(router,{msg, ReTweet}).
+get_retweets(Tweet, {struct, ReTweet}) ->
+    NewTweet = proplists:delete(<<"retweeted_status">>, Tweet),
+    % io:format("~n____________________________________________________________________________________________________~n~p~n",[ReTweet]),
+    gen_server:cast(router, {msg, NewTweet}),
+    gen_server:cast(router, {msg, ReTweet}).

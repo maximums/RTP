@@ -29,12 +29,12 @@ init(_Args) ->
             modules => [daynamic_supervisor]
         },
         #{
-            id => dayn_super_engagement,
-            start => {dayn_super_engagement, start_link, []},
+            id => second_main_super,
+            start => {second_main_super, start_link, []},
             restart => permanent,
             shutdown => infinity,
             type => supervisor,
-            modules => [dayn_super_engagement]
+            modules => [second_main_super]
         },
         #{
             id => autoscaler,
@@ -59,14 +59,6 @@ init(_Args) ->
             shutdown => infinity,
             type => worker,
             modules => [connection]
-        },
-        #{
-            id => aggregator,
-            start => {aggregator, start_link, []},
-            restart => permanent,
-            shutdown => infinity,
-            type => worker,
-            modules => [aggregator]
         }
     ],
 
