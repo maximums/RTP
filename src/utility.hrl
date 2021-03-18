@@ -62,9 +62,15 @@
 -endif.
 
 -ifndef(RAND).
--define(RAND, fun() -> (rand:uniform(150) + 100) end ).
+-define(RAND, fun() -> rand:uniform(150) + 100 end ).
 -endif.
 
 -ifndef(sink_timer).
--define(sink_timer, fun(Time) -> (erlang:monotonic_time(second) - Time) >= ?MAX_DELAY end ).
+-define(sink_timer,
+    fun(Time) -> 
+        T = erlang:monotonic_time(second),
+        Res = T - Time,
+        Res >= ?MAX_DELAY
+    end 
+).
 -endif.
