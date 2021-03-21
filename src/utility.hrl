@@ -13,15 +13,15 @@
 -endif.
 
 -ifndef(MAX_BATCH_SIZE).
--define(MAX_BATCH_SIZE, 128).
+-define(MAX_BATCH_SIZE, 150).
 -endif.
 
 -ifndef(MAX_DELAY).
--define(MAX_DELAY, 1/5). % 200 ms
+-define(MAX_DELAY, 200). % 200 ms
 -endif.
 
 
--ifndef(db_client).
+-ifndef(conn_opt).
 -define(conn_opt, [
         { name,  mongoc_pool },
         { register,  mongoc_topology },
@@ -52,24 +52,16 @@
     "ciotkiicluster-shard-00-01.saxmi.mongodb.net:27017",
     "ciotkiicluster-shard-00-02.saxmi.mongodb.net:27017"    
 ]}).
--define(db_client, 
-    fun() -> 
-        application:ensure_all_started(mongodb),
-        {ok, MongoClient} = mongoc:connect(?seed, ?conn_opt, ?worker_opt),
-        MongoClient
-    end
-).
 -endif.
 
 -ifndef(RAND).
--define(RAND, fun() -> rand:uniform(150) + 100 end ).
+-define(RAND, fun() -> rand:uniform(50) + 50 end ).
 -endif.
 
 -ifndef(sink_timer).
 -define(sink_timer,
     fun(Time) -> 
-        T = erlang:monotonic_time(second),
-        Res = T - Time,
+        Res = erlang:monotonic_time(millisecond) - Time,
         Res >= ?MAX_DELAY
     end 
 ).
