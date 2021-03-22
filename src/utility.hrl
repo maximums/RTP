@@ -3,6 +3,7 @@
 
 -define(TWEET1,"http://localhost:8000/tweets/1").
 -define(TWEET2,"http://localhost:8000/tweets/2").
+-define(PANIC, [{<<"text">>, <<"PANIC">>}]).
 
 -ifndef(INTERVAL).
 -define(INTERVAL, 1000). % One second

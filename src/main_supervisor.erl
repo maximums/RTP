@@ -2,8 +2,6 @@
 -module(main_supervisor).
 
 -behaviour(supervisor).
--define(TWEET1,"http://localhost:8000/tweets/1").
--define(TWEET2,"http://localhost:8000/tweets/2").
 
 %% API
 -export([start_link/0]).
@@ -54,7 +52,7 @@ init(_Args) ->
         },
         #{
             id => connection,
-            start => {connection, start_link, [?TWEET1,?TWEET2]},
+            start => {connection, start_link, []},
             restart => permanent,
             shutdown => infinity,
             type => worker,

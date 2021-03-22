@@ -1,5 +1,5 @@
 -module(sse_stream).
--define(PANIC, [{<<"text">>, <<"PANIC">>}]).
+-include("../utility.hrl").
 -author("Dodi Cristian-Dumitru").
 
 -export([get_msgs/2]).

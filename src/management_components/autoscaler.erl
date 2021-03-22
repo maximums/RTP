@@ -1,8 +1,8 @@
 -module(autoscaler).
 -behaviour(gen_server).
+-include("../utility.hrl").
 -author("Dodi Cristian-Dumitru").
 
--define(INTERVAL, 1000). % One second
 
 -export([start_link/0]).
 
